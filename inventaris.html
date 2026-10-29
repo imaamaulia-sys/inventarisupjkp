@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Sistem Inventaris Alat</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#0B1120;color:#F1F5F9}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#111827}::-webkit-scrollbar-thumb{background:#374151;border-radius:4px}
+#app{display:flex;height:100vh;overflow:hidden}
+aside{width:230px;background:#111827;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;flex-shrink:0;height:100vh;position:sticky;top:0}
+.logo-area{padding:22px 18px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
+.logo-box{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#6366F1,#818CF8);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.logo-text{font-size:14px;font-weight:800;color:#F1F5F9;line-height:1.2}
+.logo-sub{font-size:10px;color:#64748B;font-weight:600;letter-spacing:.5px}
+.nav-section{font-size:10px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:1px;padding:14px 10px 6px}
+nav{flex:1;padding:12px 8px;overflow-y:auto}
+.nav-btn{width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-weight:500;font-size:14px;text-align:left;background:transparent;color:#94A3B8;border-left:3px solid transparent;transition:all .15s;margin-bottom:2px}
+.nav-btn:hover{background:rgba(255,255,255,.05);color:#F1F5F9}
+.nav-btn.active{background:rgba(99,102,241,.15);color:#818CF8;font-weight:700;border-left:3px solid #6366F1}
+.nav-badge{font-size:10px;font-weight:800;padding:2px 6px;border-radius:99px;margin-left:auto}
+.nav-badge.amber{background:#F59E0B;color:#000}
+.nav-badge.blue{background:#3B82F6;color:#fff}
+.sidebar-footer{padding:12px 18px;border-top:1px solid rgba(255,255,255,.07);font-size:11px;color:#64748B}
+main{flex:1;overflow-y:auto;background:#0B1120}
+.page{padding:30px 32px;max-width:1400px}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+.page-title{font-size:26px;font-weight:800;color:#F1F5F9;margin-bottom:4px}
+.page-sub{color:#64748B;font-size:14px}
+.header-actions{display:flex;gap:10px;flex-wrap:wrap}
+.card{background:#111827;border-radius:14px;border:1px solid rgba(255,255,255,.07)}
+.card-pad{padding:20px 22px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:#111827;border-radius:14px;border:1px solid rgba(255,255,255,.07);padding:20px 22px;cursor:pointer;transition:border-color .2s}
+.stat-card:hover{border-color:#6366F1}
+.stat-label{font-size:13px;color:#64748B;font-weight:600;margin-bottom:14px}
+.stat-icon{width:42px;height:42px;border-radius:10px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:22px}
+.stat-top{display:flex;align-items:center;justify-content:space-between}
+.stat-value{font-size:26px;font-weight:800;line-height:1}
+.stat-hint{font-size:12px;color:#64748B;margin-top:6px}
+.tabs{display:flex;gap:4px;margin-bottom:20px;background:#1A2234;padding:4px;border-radius:10px;width:fit-content}
+.tab-btn{padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-weight:600;font-size:14px;background:transparent;color:#64748B;display:flex;align-items:center;gap:8px;transition:all .15s}
+.tab-btn.active{background:#6366F1;color:#fff}
+.tab-count{background:#3B82F6;color:#fff;font-size:11px;padding:1px 7px;border-radius:99px;font-weight:700}
+.tab-btn.active .tab-count{background:rgba(255,255,255,.25)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{padding:10px 14px;text-align:left;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.07)}
+td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.07);color:#F1F5F9;vertical-align:middle}
+td.muted{color:#64748B}
+td.nowrap{white-space:nowrap}
+tbody tr:hover{background:rgba(99,102,241,.05);cursor:default}
+.empty-state{text-align:center;padding:40px 0;color:#64748B}
+.empty-state .emoji{font-size:36px;margin-bottom:8px}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
+.badge-green{background:rgba(16,185,129,.15);color:#34D399;border:1px solid rgba(16,185,129,.3)}
+.badge-amber{background:rgba(245,158,11,.15);color:#FCD34D;border:1px solid rgba(245,158,11,.3)}
+.badge-red{background:rgba(239,68,68,.15);color:#FCA5A5;border:1px solid rgba(239,68,68,.3)}
+.badge-blue{background:rgba(59,130,246,.15);color:#93C5FD;border:1px solid rgba(59,130,246,.3)}
+.badge-indigo{background:rgba(99,102,241,.15);color:#A5B4FC;border:1px solid rgba(99,102,241,.3)}
+.badge-gray{background:rgba(107,114,128,.15);color:#9CA3AF;border:1px solid rgba(107,114,128,.3)}
+.btn{padding:9px 20px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-weight:600;font-size:14px;transition:opacity .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{opacity:.85}
+.btn-primary{background:#6366F1;color:#fff}
+.btn-success{background:#10B981;color:#fff}
+.btn-ghost{background:rgba(255,255,255,.07);color:#F1F5F9;border:1px solid rgba(255,255,255,.07)}
+.btn-danger{background:rgba(239,68,68,.15);color:#FCA5A5;border:1px solid rgba(239,68,68,.3)}
+.btn-amber{background:rgba(245,158,11,.15);color:#FCD34D;border:1px solid rgba(245,158,11,.3)}
+.btn-sm{padding:6px 14px;font-size:13px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.alert{border-radius:10px;padding:11px 16px;display:flex;align-items:center;gap:12px;font-size:14px;margin-bottom:10px}
+.alert-amber{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:#FCD34D}
+.alert-red{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#FCA5A5}
+.alert-indigo{background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);color:#A5B4FC}
+.alert-green{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:#34D399}
+.alert-btn{margin-left:auto;padding:5px 14px;border-radius:6px;border:none;cursor:pointer;font-family:inherit;font-weight:600;font-size:13px}
+.progress-bg{background:rgba(255,255,255,.08);border-radius:99px;height:6px;overflow:hidden}
+.progress-bar{height:100%;border-radius:99px;transition:width .5s}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-box{background:#111827;border-radius:16px;width:100%;border:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;max-height:90vh}
+.modal-box.wide{max-width:700px}
+.modal-box.narrow{max-width:520px}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.modal-title{font-size:17px;font-weight:700;color:#F1F5F9}
+.modal-close{background:rgba(255,255,255,.07);border:none;color:#94A3B8;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.modal-body{padding:20px 24px;overflow-y:auto;flex:1}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+.field{margin-bottom:14px}
+.field label{font-size:12px;color:#94A3B8;margin-bottom:6px;display:block;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+input,select,textarea{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#1E2D45;border:1px solid rgba(255,255,255,.1);color:#F1F5F9;border-radius:8px;padding:10px 14px;width:100%;font-size:14px;outline:none;transition:border-color .2s}
+input:focus,select:focus,textarea:focus{border-color:rgba(99,102,241,.6);box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+select option{background:#1E2D45}
+textarea{resize:vertical;min-height:70px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.info-box{background:#1A2234;border-radius:10px;padding:12px 16px;font-size:14px;margin-bottom:14px}
+.section-label{font-weight:700;color:#64748B;font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin:16px 0 12px}
+.overflowx{overflow-x:auto}
+.dep-card{background:#111827;border-radius:14px;border:1px solid rgba(255,255,255,.07);padding:18px 22px;margin-bottom:14px}
+.dep-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+.dep-cell{background:#1A2234;border-radius:10px;padding:12px 14px}
+.dep-cell-label{font-size:11px;color:#64748B;margin-bottom:4px;font-weight:600}
+.dep-cell-val{font-size:14px;font-weight:700}
+.filter-bar{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filter-btn{padding:5px 14px;border-radius:99px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;background:rgba(255,255,255,.07);color:#64748B;transition:all .15s}
+.filter-btn.active{background:#6366F1;color:#fff}
+.concept-box{padding:16px 20px;margin-bottom:24px;background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.2);border-radius:14px}
+.concept-title{font-size:14px;font-weight:700;color:#818CF8;margin-bottom:8px}
+.concept-body{font-size:13px;color:#94A3B8;line-height:1.7}
+.search-bar{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.07)}
+.mono{font-family:monospace;background:#1A2234;padding:3px 8px;border-radius:5px;font-size:12px}
+.stock-val{font-size:20px;font-weight:800}
+.avail-val{font-size:20px;font-weight:800}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,.07);border-top:3px solid #6366F1;border-radius:50%;animation:spin .8s linear infinite}
+.loading{height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.hint{font-size:11px;color:#64748B;margin-top:4px}
+.table-wrap{padding:0}
+.actions{display:flex;gap:6px}
+
+.setup-wrap{height:100vh;display:flex;align-items:center;justify-content:center;background:#0B1120}
+.setup-card{background:#111827;border-radius:20px;border:1px solid rgba(255,255,255,.07);padding:40px;max-width:500px;width:100%}
+.setup-logo{width:52px;height:52px;background:linear-gradient(135deg,#6366F1,#818CF8);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 20px}
+.setup-title{font-size:22px;font-weight:800;color:#F1F5F9;text-align:center;margin-bottom:6px}
+.setup-sub{font-size:14px;color:#64748B;text-align:center;margin-bottom:28px}
+.step-box{background:#1A2234;border-radius:12px;padding:16px;margin-bottom:20px;font-size:13px;color:#94A3B8;line-height:1.8}
+.step-box strong{color:#818CF8}
+.step-box code{background:rgba(99,102,241,.2);color:#A5B4FC;padding:2px 7px;border-radius:4px;font-family:monospace;font-size:12px}
+.conn-status{display:flex;align-items:center;gap:8px;font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:12px}
+.conn-ok{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#34D399}
+.conn-err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#FCA5A5}
+.conn-loading{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3);color:#A5B4FC}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<div id="app">
+  <div class="loading"><div class="spinner"></div><div style="color:#64748B;font-size:14px">Memuat data...</div></div>
+</div>
+
+<script>
+
+// ─── FIREBASE ────────────────────────────────────────────────
+let db = null;
+let _fbUnsub = null;
+let _fbStatus = 'loading'; // 'loading' | 'ok' | 'error' | 'noconfig'
+
+function loadConfig(){
+  try{const r=localStorage.getItem('fb_cfg');if(r)return JSON.parse(r);}catch{}
+  return null;
+}
+function saveConfig(cfg){
+  try{localStorage.setItem('fb_cfg',JSON.stringify(cfg));}catch{}
+}
+
+function initFirebase(cfg){
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(cfg);
+    db = firebase.firestore();
+    _fbStatus='ok';
+    // Real-time listener — data otomatis sinkron ke semua browser
+    if(_fbUnsub) _fbUnsub();
+    _fbUnsub = db.collection('inventaris').doc('data').onSnapshot(doc=>{
+      if(doc.exists()){
+        const d=doc.data();
+        S.consumables=d.consumables||INIT.consumables;
+        S.txs=d.txs||INIT.txs;
+        S.tools=d.tools||INIT.tools;
+        S.loans=d.loans||INIT.loans;
+        S.assets=d.assets||INIT.assets;
+        S.maint=d.maint||INIT.maint;
+      }else{
+        Object.assign(S,{consumables:INIT.consumables,txs:INIT.txs,tools:INIT.tools,loans:INIT.loans,assets:INIT.assets,maint:INIT.maint});
+        saveStorage(); // inisialisasi dokumen pertama kali
+      }
+      render();
+    }, err=>{
+      console.error('Firestore:',err);
+      _fbStatus='error';
+      render();
+    });
+    return true;
+  }catch(e){
+    console.error('Firebase init:',e);
+    _fbStatus='error';
+    return false;
+  }
+}
+
+// ─── STATE ───────────────────────────────────────────────────
+const INIT = {
+  consumables:[
+    {id:'c1',name:'Kertas HVS A4',unit:'Rim',stock:50,minStock:10,category:'ATK',desc:''},
+    {id:'c2',name:'Tinta Printer Hitam',unit:'Botol',stock:3,minStock:5,category:'ATK',desc:''},
+    {id:'c3',name:'Pena Ballpoint',unit:'Lusin',stock:15,minStock:3,category:'ATK',desc:''},
+    {id:'c4',name:'Amplop Surat',unit:'Kotak',stock:8,minStock:5,category:'ATK',desc:''},
+    {id:'c5',name:'Spidol Whiteboard',unit:'Kotak',stock:2,minStock:4,category:'ATK',desc:''},
+  ],
+  txs:[
+    {id:'t1',type:'in',itemId:'c1',itemName:'Kertas HVS A4',qty:20,date:'2025-05-01',by:'Admin',purpose:'Pengadaan Bulanan',dept:'',notes:''},
+    {id:'t2',type:'out',itemId:'c1',itemName:'Kertas HVS A4',qty:5,date:'2025-05-10',by:'Budi Santoso',purpose:'Cetak Laporan',dept:'Sekretariat',notes:''},
+    {id:'t3',type:'out',itemId:'c3',itemName:'Pena Ballpoint',qty:2,date:'2025-05-12',by:'Siti Rahayu',purpose:'Keperluan Rapat',dept:'Umum',notes:''},
+  ],
+  tools:[
+    {id:'lt1',name:'Bor Tanah',code:'BOR-001',unit:'Unit',qty:3,available:2,condition:'Baik',category:'Alat Lapangan',desc:''},
+    {id:'lt2',name:'Timbangan Digital',code:'TBG-001',unit:'Unit',qty:5,available:4,condition:'Baik',category:'Alat Ukur',desc:''},
+    {id:'lt3',name:'GPS Handheld',code:'GPS-001',unit:'Unit',qty:2,available:2,condition:'Baik',category:'Alat Ukur',desc:''},
+    {id:'lt4',name:'Kamera Dokumentasi',code:'KAM-001',unit:'Unit',qty:2,available:2,condition:'Baik',category:'Elektronik',desc:''},
+  ],
+  loans:[
+    {id:'l1',toolId:'lt1',toolName:'Bor Tanah',code:'BOR-001',borrower:'Ahmad Fauzi',dept:'Tim Lapangan A',phone:'081234567890',date:'2025-05-15',dueDate:'2025-05-22',qty:1,purpose:'Survey Tanah Kec. Ciledug',conditionOut:'Baik',status:'active',returnDate:null,conditionIn:null,returnNotes:'',notes:''},
+  ],
+  assets:[
+    {id:'a1',name:'Meja Kerja Oak',code:'FRN-001',category:'Furnitur',purchaseDate:'2022-01-15',purchasePrice:2500000,lifespan:10,condition:'Baik',location:'Ruang Kerja',serial:'MBL-2022-001',status:'Aktif',desc:''},
+    {id:'a2',name:'Monitor LED 24"',code:'ELK-001',category:'Elektronik',purchaseDate:'2023-03-20',purchasePrice:3200000,lifespan:5,condition:'Baik',location:'Ruang Kerja',serial:'MON-2023-024',status:'Aktif',desc:''},
+    {id:'a3',name:'Kursi Ergonomis',code:'FRN-002',category:'Furnitur',purchaseDate:'2022-06-10',purchasePrice:1800000,lifespan:8,condition:'Cukup',location:'Ruang Kepala',serial:'KRS-2022-003',status:'Aktif',desc:''},
+    {id:'a4',name:'Printer Canon IP',code:'ELK-002',category:'Elektronik',purchaseDate:'2021-08-05',purchasePrice:1500000,lifespan:5,condition:'Cukup',location:'Ruang Tata Usaha',serial:'PRN-2021-001',status:'Aktif',desc:''},
+    {id:'a5',name:'Lemari Arsip Besi',code:'FRN-003',category:'Furnitur',purchaseDate:'2020-03-10',purchasePrice:3500000,lifespan:15,condition:'Baik',location:'Ruang Arsip',serial:'LAB-2020-003',status:'Aktif',desc:''},
+  ],
+  maint:[
+    {id:'m1',assetId:'a2',assetName:'Monitor LED 24"',date:'2024-06-15',type:'Perawatan Rutin',cost:150000,desc:'Pembersihan layar dan port',tech:'Teknisi Internal'},
+    {id:'m2',assetId:'a4',assetName:'Printer Canon IP',date:'2024-09-20',type:'Perbaikan',cost:350000,desc:'Ganti head printer',tech:'Service Center'},
+  ],
+};
+
+let S = {
+  page:'dashboard', tab:{consumables:'items',longterm:'tools',assets:'list'},
+  confirmPending:null,
+  modal:null, form:{}, selId:null, search:'', assetFilter:'all', setupErr:'',
+  consumables:[], txs:[], tools:[], loans:[], assets:[], maint:[]
+};
+
+// ─── HELPERS ─────────────────────────────────────────────────
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const tod=()=>new Date().toISOString().split('T')[0];
+const fmtDate=d=>d?new Date(d+'T12:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}):'–';
+const fmtRp=n=>'Rp '+Number(n).toLocaleString('id-ID');
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+const calcDep=a=>{
+  if(!a.purchaseDate||!a.purchasePrice||!a.lifespan)return null;
+  const yrs=(Date.now()-new Date(a.purchaseDate).getTime())/(365.25*24*3600*1000);
+  const ann=a.purchasePrice/a.lifespan;
+  const acc=Math.min(ann*yrs,a.purchasePrice);
+  const bv=Math.max(a.purchasePrice-acc,0);
+  const pct=Math.min((yrs/a.lifespan)*100,100);
+  return{annual:ann,accumulated:acc,bookValue:bv,pct,years:yrs};
+};
+
+const condBadge=c=>{
+  if(c==='Baik')return'<span class="badge badge-green">'+esc(c)+'</span>';
+  if(c==='Cukup')return'<span class="badge badge-amber">'+esc(c)+'</span>';
+  if(c==='Perlu Perbaikan')return'<span class="badge badge-red">'+esc(c)+'</span>';
+  if(c==='Rusak')return'<span class="badge badge-gray">'+esc(c)+'</span>';
+  return'<span class="badge badge-indigo">'+esc(c)+'</span>';
+};
+const statBadge=s=>{
+  if(s==='Aktif')return'<span class="badge badge-green">'+esc(s)+'</span>';
+  if(s==='Dalam Perbaikan')return'<span class="badge badge-amber">'+esc(s)+'</span>';
+  if(s==='Disposal'||s==='Hilang')return'<span class="badge badge-red">'+esc(s)+'</span>';
+  return'<span class="badge badge-gray">'+esc(s)+'</span>';
+};
+
+// ─── STORAGE ─────────────────────────────────────────────────
+function saveStorage(){
+  if(!db) return;
+  const data={consumables:S.consumables,txs:S.txs,tools:S.tools,loans:S.loans,assets:S.assets,maint:S.maint};
+  db.collection('inventaris').doc('data').set(data).catch(e=>console.error('Save:',e));
+}
+
+// ─── PRINT ───────────────────────────────────────────────────
+function printLoan(loan){
+  const w=window.open('','_blank','width=850,height=700');
+  const h='<html><head><meta charset="UTF-8"><title>Surat Peminjaman</title><style>body{font-family:Arial,sans-serif;padding:40px;max-width:720px;margin:0 auto;color:#111;font-size:13px}.hd{text-align:center;padding-bottom:18px;margin-bottom:24px;border-bottom:2px solid #111}.hd h1{font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin:0 0 4px}.sec{font-size:13px;font-weight:700;text-transform:uppercase;border-left:4px solid #111;padding-left:10px;margin:20px 0 10px;color:#333}table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:14px}td{padding:7px 12px;border:1px solid #ddd;vertical-align:top}td:first-child{width:38%;background:#f7f7f7;font-weight:600}.sg{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px}.sl{text-align:center}.sl div{border-top:1px solid #111;margin-top:65px;padding-top:8px;font-size:12px;font-weight:600}.note{background:#fffbeb;border:1px solid #fcd34d;padding:12px;font-size:12px;margin-top:16px;border-radius:4px;color:#78350f}.btn{background:#111;color:#fff;border:none;padding:10px 28px;cursor:pointer;font-size:13px;border-radius:4px;margin:4px}@media print{.np{display:none!important}}</style></head><body>';
+  w.document.write(h);
+  w.document.write('<div class="hd"><h1>Surat Peminjaman Alat</h1><p>Inventarisasi Alat Jangka Panjang</p></div>');
+  w.document.write('<div style="text-align:right;font-size:12px;color:#666;margin-bottom:18px">No: SPJ-'+loan.id.toUpperCase().slice(0,8)+'-'+new Date().getFullYear()+'</div>');
+  w.document.write('<div class="sec">Data Peminjam</div><table><tr><td>Nama Peminjam</td><td>'+esc(loan.borrower)+'</td></tr><tr><td>Departemen / Bagian</td><td>'+esc(loan.dept||'–')+'</td></tr><tr><td>No. Telepon</td><td>'+esc(loan.phone||'–')+'</td></tr></table>');
+  w.document.write('<div class="sec">Data Alat yang Dipinjam</div><table><tr><td>Nama Alat</td><td>'+esc(loan.toolName)+'</td></tr><tr><td>Kode Alat</td><td>'+esc(loan.code||'–')+'</td></tr><tr><td>Jumlah Dipinjam</td><td>'+loan.qty+' Unit</td></tr><tr><td>Kondisi Saat Dipinjam</td><td>'+esc(loan.conditionOut)+'</td></tr></table>');
+  w.document.write('<div class="sec">Informasi Peminjaman</div><table><tr><td>Tujuan Peminjaman</td><td>'+esc(loan.purpose)+'</td></tr><tr><td>Tanggal Peminjaman</td><td>'+fmtDate(loan.date)+'</td></tr><tr><td>Batas Pengembalian</td><td>'+fmtDate(loan.dueDate)+'</td></tr><tr><td>Catatan</td><td>'+esc(loan.notes||'–')+'</td></tr></table>');
+  w.document.write('<div class="note">&#9888; Peminjam bertanggung jawab penuh atas kondisi alat selama masa peminjaman. Alat wajib dikembalikan dalam kondisi baik sebelum batas waktu yang ditentukan.</div>');
+  w.document.write('<div class="sg"><div class="sl"><div>Yang Meminjam<br><span style="font-weight:400;font-size:11px">('+esc(loan.borrower)+')</span></div></div><div class="sl"><div>Petugas / PIC<br><span style="font-weight:400;font-size:11px">(...............................)</span></div></div></div>');
+  w.document.write('<p style="font-size:11px;color:#999;margin-top:28px;text-align:center">Dicetak: '+new Date().toLocaleString('id-ID')+'</p>');
+  w.document.write('<div class="np" style="margin-top:20px;text-align:center;border-top:1px solid #eee;padding-top:18px"><button class="btn" onclick="window.print()">&#128424; Cetak</button><button class="btn" style="background:#555" onclick="window.close()">&#x2715; Tutup</button></div>');
+  w.document.write('</body></html>');
+  w.document.close();
+}
+
+function printReturn(loan){
+  const w=window.open('','_blank','width=850,height=700');
+  const h='<html><head><meta charset="UTF-8"><title>Berita Acara Pengembalian</title><style>body{font-family:Arial,sans-serif;padding:40px;max-width:720px;margin:0 auto;color:#111;font-size:13px}.hd{text-align:center;padding-bottom:18px;margin-bottom:24px;border-bottom:2px solid #111}.hd h1{font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin:0 0 4px}.stamp{text-align:center;border:3px solid #16a34a;color:#15803d;padding:14px;margin:20px 0;font-size:19px;font-weight:700;text-transform:uppercase;letter-spacing:2px;border-radius:6px;background:#f0fdf4}.sec{font-size:13px;font-weight:700;text-transform:uppercase;border-left:4px solid #111;padding-left:10px;margin:20px 0 10px;color:#333}table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:14px}td{padding:7px 12px;border:1px solid #ddd;vertical-align:top}td:first-child{width:38%;background:#f7f7f7;font-weight:600}.sg{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px}.sl{text-align:center}.sl div{border-top:1px solid #111;margin-top:65px;padding-top:8px;font-size:12px;font-weight:600}.btn{background:#111;color:#fff;border:none;padding:10px 28px;cursor:pointer;font-size:13px;border-radius:4px;margin:4px}@media print{.np{display:none!important}}</style></head><body>';
+  w.document.write(h);
+  w.document.write('<div class="hd"><h1>Berita Acara Pengembalian Alat</h1><p>Inventarisasi Alat Jangka Panjang</p></div>');
+  w.document.write('<div class="stamp">&#10003; ALAT TELAH DIKEMBALIKAN</div>');
+  w.document.write('<div class="sec">Rekap Peminjaman</div><table><tr><td>Nama Alat</td><td>'+esc(loan.toolName)+' ('+esc(loan.code||'')+')</td></tr><tr><td>Jumlah</td><td>'+loan.qty+' Unit</td></tr><tr><td>Nama Peminjam</td><td>'+esc(loan.borrower)+'</td></tr><tr><td>Departemen</td><td>'+esc(loan.dept||'–')+'</td></tr><tr><td>Tujuan Peminjaman</td><td>'+esc(loan.purpose)+'</td></tr><tr><td>Tanggal Dipinjam</td><td>'+fmtDate(loan.date)+'</td></tr><tr><td>Batas Pengembalian</td><td>'+fmtDate(loan.dueDate)+'</td></tr></table>');
+  w.document.write('<div class="sec">Informasi Pengembalian</div><table><tr><td>Tanggal Dikembalikan</td><td><strong>'+fmtDate(loan.returnDate)+'</strong></td></tr><tr><td>Kondisi Saat Dipinjam</td><td>'+esc(loan.conditionOut)+'</td></tr><tr><td>Kondisi Saat Dikembalikan</td><td><strong>'+esc(loan.conditionIn)+'</strong></td></tr><tr><td>Catatan</td><td>'+esc(loan.returnNotes||'–')+'</td></tr></table>');
+  w.document.write('<div class="sg"><div class="sl"><div>Yang Mengembalikan<br><span style="font-weight:400;font-size:11px">('+esc(loan.borrower)+')</span></div></div><div class="sl"><div>Petugas Penerima<br><span style="font-weight:400;font-size:11px">(...............................)</span></div></div></div>');
+  w.document.write('<p style="font-size:11px;color:#999;margin-top:28px;text-align:center">Dicetak: '+new Date().toLocaleString('id-ID')+'</p>');
+  w.document.write('<div class="np" style="margin-top:20px;text-align:center;border-top:1px solid #eee;padding-top:18px"><button class="btn" onclick="window.print()">&#128424; Cetak</button><button class="btn" style="background:#555" onclick="window.close()">&#x2715; Tutup</button></div>');
+  w.document.write('</body></html>');
+  w.document.close();
+}
+
+// ─── RENDER HELPERS ──────────────────────────────────────────
+function emptyState(){return'<div class="empty-state"><div class="emoji">📦</div><p>Belum ada data</p></div>';}
+
+function statCard(label,val,icon,color,page){
+  const style=color?'color:'+color+';':'';
+  const click=page?'data-nav="'+page+'"':'';
+  return'<div class="stat-card" '+click+' style="'+(page?'cursor:pointer':'')+'">'
+    +'<div class="stat-top"><span class="stat-label">'+label+'</span><span class="stat-icon">'+icon+'</span></div>'
+    +'<div class="stat-value" style="'+style+'">'+val+'</div>'
+    +'</div>';
+}
+
+function progressBar(pct,color){
+  return'<div class="progress-bg"><div class="progress-bar" style="width:'+Math.min(pct,100)+'%;background:'+color+'"></div></div>';
+}
+
+function stockStatus(stock,minStock){
+  const pct=Math.min((stock/Math.max(minStock*3,1))*100,100);
+  const color=stock===0?'#EF4444':stock<minStock?'#F59E0B':'#10B981';
+  const label=stock===0?'HABIS':stock<minStock?'RENDAH':'Normal';
+  return progressBar(pct,color)+'<div style="font-size:11px;color:'+color+';margin-top:3px;font-weight:600">'+label+'</div>';
+}
+
+
+// ─── SETUP PAGE ──────────────────────────────────────────────
+function renderSetup(errMsg){
+  return '<div class="setup-wrap"><div class="setup-card">'
+    +'<div class="setup-logo">🔥</div>'
+    +'<div class="setup-title">Hubungkan ke Firebase</div>'
+    +'<div class="setup-sub">Agar data tersinkron di semua browser & perangkat</div>'
+    +(errMsg?'<div class="conn-status conn-err">⚠️ '+esc(errMsg)+'</div>':'')
+    +'<div class="step-box">'
+    +'<strong>Cara mendapatkan konfigurasi Firebase:</strong><br>'
+    +'1. Buka <code>console.firebase.google.com</code><br>'
+    +'2. Buat project baru (atau pilih yang sudah ada)<br>'
+    +'3. Klik <code>+ Add App</code> → pilih ikon Web (&lt;/&gt;)<br>'
+    +'4. Setelah registrasi, salin nilai dari <code>firebaseConfig</code><br>'
+    +'5. Aktifkan <strong>Firestore Database</strong> → Start in test mode'
+    +'</div>'
+    +'<div class="field"><label>API Key</label><input id="fb_apiKey" placeholder="AIzaSy..."></div>'
+    +'<div class="field"><label>Project ID</label><input id="fb_projectId" placeholder="nama-project-anda"></div>'
+    +'<div class="field"><label>App ID</label><input id="fb_appId" placeholder="1:123456:web:abc..."></div>'
+    +'<div class="field"><label>Auth Domain (opsional)</label><input id="fb_authDomain" placeholder="nama-project.firebaseapp.com"></div>'
+    +'<button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" data-action="connectFirebase">🔥 Sambungkan & Mulai</button>'
+    +'</div></div>';
+}
+
+// ─── SIDEBAR ─────────────────────────────────────────────────
+function renderSidebar(){
+  const lowStock=S.consumables.filter(c=>c.stock<c.minStock).length;
+  const activeLoans=S.loans.filter(l=>l.status==='active').length;
+  const navItems=[
+    {id:'dashboard',icon:'▦',label:'Dashboard'},
+    {id:'consumables',icon:'📦',label:'Alat Habis Pakai'},
+    {id:'longterm',icon:'🔧',label:'Alat Jangka Panjang'},
+    {id:'assets',icon:'🏷️',label:'Alat Investasi'},
+  ];
+  let nav=navItems.map(item=>{
+    const active=S.page===item.id?'active':'';
+    let badge='';
+    if(item.id==='consumables'&&lowStock>0)badge='<span class="nav-badge amber">'+lowStock+'</span>';
+    if(item.id==='longterm'&&activeLoans>0)badge='<span class="nav-badge blue">'+activeLoans+'</span>';
+    return'<button class="nav-btn '+active+'" data-nav="'+item.id+'"><span style="font-size:16px">'+item.icon+'</span><span>'+item.label+'</span>'+badge+'</button>';
+  }).join('');
+  return'<aside>'
+    +'<div class="logo-area"><div class="logo-box"><div class="logo-icon">📋</div>'
+    +'<div><div class="logo-text">Sistem<br>Inventaris</div><div class="logo-sub">MANAJEMEN ALAT</div></div></div></div>'
+    +'<nav><div class="nav-section">Menu Utama</div>'+nav+'</nav>'
+    +'<div class="sidebar-footer">'
+    +(_fbStatus==='ok'?'<div class="conn-status conn-ok" style="margin-bottom:8px">🔥 Firebase terhubung</div>':'')
+    +(_fbStatus==='error'?'<div class="conn-status conn-err" style="margin-bottom:8px">⚠️ Koneksi error</div>':'')
+    +'<div style="display:flex;align-items:center;justify-content:space-between"><div style="font-weight:600">v1.0.0</div><button class="btn btn-ghost btn-sm" data-action="openSetup" style="font-size:11px;padding:3px 8px">⚙️ Config</button></div>
+    +'<div>'+new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'})+'</div></div>'
+    +'</aside>';
+}
+
+// ─── DASHBOARD ───────────────────────────────────────────────
+function renderDashboard(){
+  const lowStock=S.consumables.filter(c=>c.stock<c.minStock).length;
+  const activeLoans=S.loans.filter(l=>l.status==='active').length;
+  const overdueLoans=S.loans.filter(l=>l.status==='active'&&new Date(l.dueDate)<new Date());
+  const totalAssetVal=S.assets.reduce((s,a)=>s+(a.purchasePrice||0),0);
+  const bookVal=S.assets.reduce((s,a)=>{const d=calcDep(a);return s+(d?d.bookValue:0);},0);
+  const recentTxs=[...S.txs].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
+
+  let alerts='';
+  if(lowStock>0)alerts+='<div class="alert alert-amber"><span>⚠️</span><span><strong>'+lowStock+' item</strong> stok di bawah minimum</span><button class="alert-btn" data-nav="consumables" style="background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#FCD34D">Lihat →</button></div>';
+  if(overdueLoans.length>0)alerts+='<div class="alert alert-red"><span>🚨</span><span><strong>'+overdueLoans.length+' peminjaman</strong> melewati batas pengembalian</span><button class="alert-btn" data-nav="longterm" style="background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.4);color:#FCA5A5">Lihat →</button></div>';
+  if(alerts)alerts='<div style="margin-bottom:24px">'+alerts+'</div>';
+
+  let statGrid='<div class="stat-grid">'
+    +statCard('Jenis Alat Habis Pakai',S.consumables.length,'📦','#6366F1','consumables')
+    +statCard('Peminjaman Aktif',activeLoans,'🔧','#3B82F6','longterm')
+    +statCard('Total Aset Investasi',S.assets.length,'🏷️','#10B981','assets')
+    +statCard('Nilai Buku Aset',fmtRp(bookVal),'💰','#F59E0B','')
+    +'</div>';
+
+  // Low stock list
+  const lowItems=S.consumables.filter(c=>c.stock<c.minStock*2).slice(0,5);
+  let lowList=lowItems.length===0?'<p style="color:#64748B;font-size:13px">Semua stok dalam kondisi aman ✓</p>'
+    :lowItems.map(c=>'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.07)">'
+      +'<div><div style="font-size:14px;font-weight:500">'+esc(c.name)+'</div><div style="font-size:12px;color:#64748B">'+esc(c.unit)+'</div></div>'
+      +'<div style="text-align:right"><div style="font-size:18px;font-weight:700;color:'+(c.stock===0?'#EF4444':c.stock<c.minStock?'#F59E0B':'#10B981')+'">'+c.stock+'</div>'
+      +'<div style="font-size:11px;color:#64748B">min: '+c.minStock+'</div></div></div>').join('');
+
+  // Active loans list
+  const actLoans=S.loans.filter(l=>l.status==='active').slice(0,4);
+  let loanList=actLoans.length===0?'<p style="color:#64748B;font-size:13px">Tidak ada peminjaman aktif</p>'
+    :actLoans.map(l=>{const ov=new Date(l.dueDate)<new Date();
+      return'<div style="padding:9px 0;border-bottom:1px solid rgba(255,255,255,.07)">'
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-start">'
+        +'<div><div style="font-size:14px;font-weight:500">'+esc(l.toolName)+' <span style="color:#64748B;font-size:12px">×'+l.qty+'</span></div>'
+        +'<div style="font-size:12px;color:#64748B">'+esc(l.borrower)+'</div></div>'
+        +(ov?'<span class="badge badge-red">TERLAMBAT</span>':'<span class="badge badge-blue">Aktif</span>')
+        +'</div><div style="font-size:11px;color:'+(ov?'#EF4444':'#64748B')+';margin-top:3px">Batas: '+fmtDate(l.dueDate)+'</div></div>';}).join('');
+
+  // Recent txs table
+  let txRows=recentTxs.map(t=>{
+    const unit=S.consumables.find(c=>c.id===t.itemId);
+    return'<tr><td class="muted nowrap">'+fmtDate(t.date)+'</td>'
+      +'<td>'+(t.type==='in'?'<span class="badge badge-green">▲ Masuk</span>':'<span class="badge badge-red">▼ Keluar</span>')+'</td>'
+      +'<td>'+esc(t.itemName)+'</td>'
+      +'<td><strong>'+t.qty+'</strong>'+(unit?' '+esc(unit.unit):'')+'</td>'
+      +'<td class="muted">'+esc(t.by||'')+(t.purpose?' — '+esc(t.purpose):'')+'</td>'
+      +'</tr>';}).join('');
+  let txTable=recentTxs.length===0?'<p style="color:#64748B;font-size:13px">Belum ada transaksi</p>'
+    :'<div class="overflowx"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Barang</th><th>Jumlah</th><th>Oleh / Tujuan</th></tr></thead><tbody>'+txRows+'</tbody></table></div>';
+
+  return '<div class="page">'
+    +'<div class="page-header"><div><div class="page-title">Dashboard</div><div class="page-sub">Ringkasan inventaris seluruh alat</div></div></div>'
+    +alerts+statGrid
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">'
+    +'<div class="card card-pad"><div style="font-size:14px;font-weight:700;margin-bottom:16px">⚠️ Stok Perlu Perhatian</div>'+lowList+'</div>'
+    +'<div class="card card-pad"><div style="font-size:14px;font-weight:700;margin-bottom:16px">🔧 Peminjaman Aktif</div>'+loanList+'</div>'
+    +'</div>'
+    +'<div class="card card-pad"><div style="font-size:14px;font-weight:700;margin-bottom:16px">📝 Transaksi Terakhir</div>'+txTable+'</div>'
+    +'</div>';
+}
+
+// ─── CONSUMABLES ─────────────────────────────────────────────
+function renderConsumables(){
+  const tab=S.tab.consumables||'items';
+  let alerts='';
+  const lowItems=S.consumables.filter(c=>c.stock<c.minStock);
+  if(lowItems.length>0)alerts='<div class="alert alert-amber" style="margin-bottom:20px">⚠️ <strong>'+lowItems.length+' item</strong> perlu restok: '+lowItems.map(c=>esc(c.name)).join(', ')+'</div>';
+
+  const tabs='<div class="tabs">'
+    +'<button class="tab-btn '+(tab==='items'?'active':'')+'" data-tab="consumables:items">📦 Daftar Barang</button>'
+    +'<button class="tab-btn '+(tab==='history'?'active':'')+'" data-tab="consumables:history">📝 Riwayat</button>'
+    +'</div>';
+
+  let content='';
+  if(tab==='items'){
+    const q=S.search.toLowerCase();
+    const items=S.consumables.filter(c=>c.name.toLowerCase().includes(q));
+    const rows=items.map(c=>'<tr>'
+      +'<td><div style="font-weight:600">'+esc(c.name)+'</div>'+(c.desc?'<div style="font-size:12px;color:#64748B">'+esc(c.desc)+'</div>':'')+'</td>'
+      +'<td class="muted">'+esc(c.category)+'</td>'
+      +'<td><span class="stock-val" style="color:'+(c.stock===0?'#EF4444':c.stock<c.minStock?'#F59E0B':'#F1F5F9')+'">'+c.stock+'</span></td>'
+      +'<td class="muted">'+c.minStock+'</td>'
+      +'<td class="muted">'+esc(c.unit)+'</td>'
+      +'<td style="min-width:120px">'+stockStatus(c.stock,c.minStock)+'</td>'
+      +'<td class="nowrap"><div class="actions">'
+      +'<button class="btn btn-success btn-sm" data-action="stockIn" data-id="'+c.id+'">+ Stok</button>'
+      +'<button class="btn btn-danger btn-sm" data-action="deleteConsumable" data-id="'+c.id+'">🗑</button>'
+      +'</div></td>'
+      +'</tr>').join('');
+    content='<div class="card"><div class="search-bar"><input id="search-inp" value="'+esc(S.search)+'" placeholder="🔍 Cari barang..." style="max-width:300px"></div>'
+      +(items.length===0?emptyState():'<div class="overflowx"><table><thead><tr><th>Nama Barang</th><th>Kategori</th><th>Stok</th><th>Min</th><th>Satuan</th><th>Status</th><th>Aksi</th></tr></thead><tbody>'+rows+'</tbody></table></div>')
+      +'</div>';
+  }else{
+    const txs=[...S.txs].sort((a,b)=>new Date(b.date)-new Date(a.date));
+    const rows=txs.map(t=>'<tr>'
+      +'<td class="muted nowrap">'+fmtDate(t.date)+'</td>'
+      +'<td>'+(t.type==='in'?'<span class="badge badge-green">▲ Masuk</span>':'<span class="badge badge-red">▼ Keluar</span>')+'</td>'
+      +'<td>'+esc(t.itemName)+'</td>'
+      +'<td><strong>'+t.qty+'</strong></td>'
+      +'<td>'+esc(t.by||'–')+'</td>'
+      +'<td class="muted">'+esc(t.dept||'–')+'</td>'
+      +'<td class="muted">'+esc(t.purpose||'–')+'</td>'
+      +'<td class="muted">'+esc(t.notes||'–')+'</td>'
+      +'</tr>').join('');
+    content='<div class="card">'+(txs.length===0?emptyState():'<div class="overflowx"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Barang</th><th>Jml</th><th>Oleh</th><th>Bagian</th><th>Tujuan</th><th>Catatan</th></tr></thead><tbody>'+rows+'</tbody></table></div>')+'</div>';
+  }
+
+  return'<div class="page">'
+    +'<div class="page-header"><div><div class="page-title">Alat Habis Pakai</div><div class="page-sub">Manajemen stok barang habis pakai</div></div>'
+    +'<div class="header-actions"><button class="btn btn-ghost" data-action="openTakeOut">📤 Ambil Barang</button><button class="btn btn-primary" data-action="openAddConsumable">+ Tambah Item</button></div></div>'
+    +alerts+tabs+content+'</div>';
+}
+
+// ─── LONG TERM ───────────────────────────────────────────────
+function renderLongTerm(){
+  const tab=S.tab.longterm||'tools';
+  const activeLoans=S.loans.filter(l=>l.status==='active');
+  const returnedLoans=S.loans.filter(l=>l.status==='returned');
+  const tabs='<div class="tabs">'
+    +'<button class="tab-btn '+(tab==='tools'?'active':'')+'" data-tab="longterm:tools">🔧 Daftar Alat</button>'
+    +'<button class="tab-btn '+(tab==='active'?'active':'')+'" data-tab="longterm:active">📋 Peminjaman Aktif'+(activeLoans.length>0?'<span class="tab-count">'+activeLoans.length+'</span>':'')+'</button>'
+    +'<button class="tab-btn '+(tab==='history'?'active':'')+'" data-tab="longterm:history">📂 Riwayat</button>'
+    +'</div>';
+
+  let content='';
+  if(tab==='tools'){
+    const rows=S.tools.map(t=>'<tr>'
+      +'<td class="muted nowrap"><span class="mono">'+esc(t.code||'–')+'</span></td>'
+      +'<td><div style="font-weight:600">'+esc(t.name)+'</div>'+(t.desc?'<div style="font-size:12px;color:#64748B">'+esc(t.desc)+'</div>':'')+'</td>'
+      +'<td class="muted">'+esc(t.category)+'</td>'
+      +'<td><strong>'+t.qty+'</strong> '+esc(t.unit)+'</td>'
+      +'<td><span class="avail-val" style="color:'+(t.available===0?'#EF4444':t.available<t.qty?'#F59E0B':'#10B981')+'">'+t.available+'</span><span style="color:#64748B;font-size:12px"> / '+t.qty+'</span></td>'
+      +'<td>'+condBadge(t.condition)+'</td>'
+      +'<td class="nowrap"><div class="actions">'
+      +'<button class="btn btn-primary btn-sm" data-action="openLoan" data-id="'+t.id+'"'+(t.available===0?' disabled':'')+'>📋 Pinjamkan</button>'
+      +'<button class="btn btn-danger btn-sm" data-action="deleteTool" data-id="'+t.id+'">🗑</button>'
+      +'</div></td>'
+      +'</tr>').join('');
+    content='<div class="card">'+(S.tools.length===0?emptyState():'<div class="overflowx"><table><thead><tr><th>Kode</th><th>Nama Alat</th><th>Kategori</th><th>Total</th><th>Tersedia</th><th>Kondisi</th><th>Aksi</th></tr></thead><tbody>'+rows+'</tbody></table></div>')+'</div>';
+  }else if(tab==='active'){
+    const rows=activeLoans.map(l=>{const ov=new Date(l.dueDate)<new Date();
+      return'<tr>'
+        +'<td><div style="font-weight:600">'+esc(l.toolName)+'</div><div style="font-size:12px;color:#64748B">'+esc(l.code||'')+'</div></td>'
+        +'<td><div style="font-weight:500">'+esc(l.borrower)+'</div><div style="font-size:12px;color:#64748B">'+esc(l.phone||'')+'</div></td>'
+        +'<td class="muted">'+esc(l.dept||'–')+'</td>'
+        +'<td><strong>'+l.qty+'</strong></td>'
+        +'<td class="muted nowrap">'+fmtDate(l.date)+'</td>'
+        +'<td class="nowrap"><span style="color:'+(ov?'#EF4444':'#F1F5F9')+';font-weight:'+(ov?700:400)+'">'+fmtDate(l.dueDate)+'</span></td>'
+        +'<td>'+(ov?'<span class="badge badge-red">⚠ TERLAMBAT</span>':'<span class="badge badge-blue">Aktif</span>')+'</td>'
+        +'<td class="nowrap"><div class="actions">'
+        +'<button class="btn btn-ghost btn-sm" data-action="printLoan" data-id="'+l.id+'">🖨</button>'
+        +'<button class="btn btn-success btn-sm" data-action="openReturn" data-id="'+l.id+'">↩ Kembalikan</button>'
+        +'</div></td>'
+        +'</tr>';}).join('');
+    content='<div class="card">'+(activeLoans.length===0?emptyState():'<div class="overflowx"><table><thead><tr><th>Alat</th><th>Peminjam</th><th>Bagian</th><th>Jml</th><th>Tgl Pinjam</th><th>Batas Kembali</th><th>Status</th><th>Aksi</th></tr></thead><tbody>'+rows+'</tbody></table></div>')+'</div>';
+  }else{
+    const rows=returnedLoans.map(l=>'<tr>'
+      +'<td><div style="font-weight:600">'+esc(l.toolName)+'</div><div style="font-size:12px;color:#64748B">'+esc(l.code||'')+'</div></td>'
+      +'<td><div>'+esc(l.borrower)+'</div><div style="font-size:12px;color:#64748B">'+esc(l.dept||'')+'</div></td>'
+      +'<td>'+l.qty+'</td>'
+      +'<td class="muted nowrap">'+fmtDate(l.date)+'</td>'
+      +'<td class="muted nowrap">'+fmtDate(l.returnDate)+'</td>'
+      +'<td>'+condBadge(l.conditionIn||'–')+'</td>'
+      +'<td class="nowrap"><button class="btn btn-ghost btn-sm" data-action="printReturn" data-id="'+l.id+'">🖨 Cetak BA</button></td>'
+      +'</tr>').join('');
+    content='<div class="card">'+(returnedLoans.length===0?emptyState():'<div class="overflowx"><table><thead><tr><th>Alat</th><th>Peminjam</th><th>Jml</th><th>Dipinjam</th><th>Dikembalikan</th><th>Kondisi Kembali</th><th>Aksi</th></tr></thead><tbody>'+rows+'</tbody></table></div>')+'</div>';
+  }
+
+  return'<div class="page">'
+    +'<div class="page-header"><div><div class="page-title">Alat Jangka Panjang</div><div class="page-sub">Peminjaman dan pengembalian alat operasional</div></div>'
+    +'<div class="header-actions"><button class="btn btn-primary" data-action="openLoanForm">📋 Form Peminjaman</button><button class="btn btn-ghost" data-action="openAddTool">+ Tambah Alat</button></div></div>'
+    +tabs+content+'</div>';
+}
+
+// ─── ASSETS ──────────────────────────────────────────────────
+function renderAssets(){
+  const tab=S.tab.assets||'list';
+  const totalVal=S.assets.reduce((s,a)=>s+(a.purchasePrice||0),0);
+  const bookVal=S.assets.reduce((s,a)=>{const d=calcDep(a);return s+(d?d.bookValue:0);},0);
+  const tabs='<div class="tabs">'
+    +'<button class="tab-btn '+(tab==='list'?'active':'')+'" data-tab="assets:list">📋 Daftar Aset</button>'
+    +'<button class="tab-btn '+(tab==='dep'?'active':'')+'" data-tab="assets:dep">📉 Penyusutan</button>'
+    +'<button class="tab-btn '+(tab==='maint'?'active':'')+'" data-tab="assets:maint">🔨 Pemeliharaan</button>'
+    +'</div>';
+
+  const statGrid='<div class="stat-grid">'
+    +statCard('Total Aset',S.assets.length,'🏷️','','')
+    +statCard('Nilai Perolehan',fmtRp(totalVal),'💰','#6366F1','')
+    +statCard('Nilai Buku',fmtRp(bookVal),'📊','#10B981','')
+    +statCard('Total Penyusutan',fmtRp(totalVal-bookVal),'📉','#F59E0B','')
+    +'</div>';
+
+  const concept='<div class="concept-box">'
+    +'<div class="concept-title">💡 Konsep Alat Investasi</div>'
+    +'<div class="concept-body">Alat investasi adalah aset tetap jangka panjang (meja, monitor, lemari, dll). Sistem mencatat: <strong style="color:#F1F5F9">harga perolehan & masa manfaat</strong> → penyusutan otomatis (metode garis lurus), <strong style="color:#F1F5F9">kondisi & lokasi</strong> → pemantauan fisik, <strong style="color:#F1F5F9">riwayat pemeliharaan</strong>, dan <strong style="color:#F1F5F9">status</strong> → Aktif / Dalam Perbaikan / Disposal / Hilang.</div>'
+    +'</div>';
+
+  let content='';
+  if(tab==='list'){
+    const filter=S.assetFilter||'all';
+    const items=filter==='all'?S.assets:S.assets.filter(a=>a.status===filter);
+    const filterBtns=['all','Aktif','Dalam Perbaikan','Disposal','Hilang'].map(f=>
+      '<button class="filter-btn '+(filter===f?'active':'')+'" data-assetfilter="'+f+'">'+(f==='all'?'Semua':f)+'</button>').join('');
+    const rows=items.map(a=>{const dep=calcDep(a);
+      return'<tr>'
+        +'<td class="muted nowrap"><span class="mono">'+esc(a.code||'–')+'</span></td>'
+        +'<td><div style="font-weight:600">'+esc(a.name)+'</div><div style="font-size:12px;color:#64748B">S/N: '+esc(a.serial||'–')+'</div></td>'
+        +'<td class="muted">'+esc(a.category)+'</td>'
+        +'<td class="muted">'+esc(a.location||'–')+'</td>'
+        +'<td>'+condBadge(a.condition)+'</td>'
+        +'<td>'+statBadge(a.status)+'</td>'
+        +'<td><div style="font-weight:700">'+(dep?fmtRp(dep.bookValue):fmtRp(a.purchasePrice))+'</div>'+(dep?'<div style="font-size:11px;color:#64748B">'+dep.pct.toFixed(0)+'% terdepresiasi</div>':'')+'</td>'
+        +'<td class="nowrap"><div class="actions">'
+        +'<button class="btn btn-ghost btn-sm" data-action="openEditAsset" data-id="'+a.id+'">✏️</button>'
+        +'<button class="btn btn-amber btn-sm" data-action="openAddMaint" data-id="'+a.id+'">🔨</button>'
+        +'<button class="btn btn-danger btn-sm" data-action="deleteAsset" data-id="'+a.id+'">🗑</button>'
+        +'</div></td>'
+        +'</tr>';}).join('');
+    content='<div class="card"><div class="filter-bar"><span style="font-size:13px;color:#64748B">Filter:</span>'+filterBtns+'</div>'
+      +(items.length===0?emptyState():'<div class="overflowx"><table><thead><tr><th>Kode</th><th>Nama Aset</th><th>Kategori</th><th>Lokasi</th><th>Kondisi</th><th>Status</th><th>Nilai Buku</th><th>Aksi</th></tr></thead><tbody>'+rows+'</tbody></table></div>')
+      +'</div>';
+  }else if(tab==='dep'){
+    content=S.assets.map(a=>{const dep=calcDep(a);if(!dep)return'';
+      const bc=dep.pct>=90?'#EF4444':dep.pct>=60?'#F59E0B':'#10B981';
+      return'<div class="dep-card">'
+        +'<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">'
+        +'<div><div style="font-weight:700;font-size:15px">'+esc(a.name)+'</div><div style="font-size:13px;color:#64748B">'+esc(a.code||'')+(a.category?' — '+esc(a.category):'')+(a.location?' — '+esc(a.location):'')+'</div></div>'
+        +statBadge(a.status)+'</div>'
+        +'<div class="dep-grid">'
+        +'<div class="dep-cell"><div class="dep-cell-label">Harga Perolehan</div><div class="dep-cell-val" style="color:#F1F5F9">'+fmtRp(a.purchasePrice)+'</div></div>'
+        +'<div class="dep-cell"><div class="dep-cell-label">Penyusutan/Tahun</div><div class="dep-cell-val" style="color:#F59E0B">'+fmtRp(dep.annual)+'</div></div>'
+        +'<div class="dep-cell"><div class="dep-cell-label">Akumulasi Penyusutan</div><div class="dep-cell-val" style="color:#EF4444">'+fmtRp(dep.accumulated)+'</div></div>'
+        +'<div class="dep-cell"><div class="dep-cell-label">Nilai Buku Saat Ini</div><div class="dep-cell-val" style="color:#10B981">'+fmtRp(dep.bookValue)+'</div></div>'
+        +'</div>'
+        +'<div style="display:flex;justify-content:space-between;font-size:12px;color:#64748B;margin-bottom:6px">'
+        +'<span>Masa Pakai: '+dep.years.toFixed(1)+' thn dari '+a.lifespan+' thn</span>'
+        +'<span style="color:'+bc+';font-weight:700">'+dep.pct.toFixed(1)+'% terdepresiasi</span></div>'
+        +progressBar(dep.pct,bc)
+        +'<div style="font-size:12px;color:#64748B;margin-top:8px">Tgl. Perolehan: '+fmtDate(a.purchaseDate)+' | Akhir Masa Manfaat: '+fmtDate(new Date(new Date(a.purchaseDate).setFullYear(new Date(a.purchaseDate).getFullYear()+a.lifespan)).toISOString().split('T')[0])+'</div>'
+        +'</div>';}).join('');
+  }else{
+    const totalMaint=S.maint.reduce((s,m)=>s+(m.cost||0),0);
+    const rows=[...S.maint].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(m=>'<tr>'
+      +'<td class="muted nowrap">'+fmtDate(m.date)+'</td>'
+      +'<td><div style="font-weight:500">'+esc(m.assetName)+'</div></td>'
+      +'<td>'+(m.type==='Perbaikan'?'<span class="badge badge-red">'+esc(m.type)+'</span>':'<span class="badge badge-indigo">'+esc(m.type)+'</span>')+'</td>'
+      +'<td class="muted">'+esc(m.tech||'–')+'</td>'
+      +'<td><span style="font-weight:700;color:#F59E0B">'+fmtRp(m.cost)+'</span></td>'
+      +'<td class="muted">'+esc(m.desc)+'</td>'
+      +'</tr>').join('');
+    content='<div class="card"><div class="filter-bar" style="justify-content:space-between"><div style="font-size:14px;font-weight:700">Riwayat Pemeliharaan</div><div style="font-size:13px;color:#64748B">Total biaya: <strong style="color:#F59E0B">'+fmtRp(totalMaint)+'</strong></div></div>'
+      +(S.maint.length===0?emptyState():'<div class="overflowx"><table><thead><tr><th>Tanggal</th><th>Aset</th><th>Jenis</th><th>Teknisi</th><th>Biaya</th><th>Keterangan</th></tr></thead><tbody>'+rows+'</tbody></table></div>')
+      +'</div>';
+  }
+
+  return'<div class="page">'
+    +'<div class="page-header"><div><div class="page-title">Alat Investasi</div><div class="page-sub">Aset jangka panjang dengan penyusutan & pemeliharaan</div></div>'
+    +'<div class="header-actions"><button class="btn btn-primary" data-action="openAddAsset">+ Tambah Aset</button></div></div>'
+    +statGrid+concept+tabs+content+'</div>';
+}
+
+
+// ─── CONFIRM DIALOG ───────────────────────────────────────────
+function renderConfirm(){
+  if(!S.confirmPending)return'';
+  const msgs={
+    doDeleteConsumable:'Hapus item ini dari daftar alat habis pakai?',
+    doDeleteTool:'Hapus alat ini dari daftar?',
+    doDeleteAsset:'Hapus aset ini dari daftar?',
+  };
+  const msg=msgs[S.confirmPending.act]||'Yakin ingin melanjutkan?';
+  return'<div class="modal-overlay" style="z-index:2000">'
+    +'<div class="modal-box narrow" style="max-width:400px">'
+    +'<div class="modal-header"><span class="modal-title">⚠️ Konfirmasi Hapus</span></div>'
+    +'<div class="modal-body">'
+    +'<p style="color:#94A3B8;font-size:14px;margin-bottom:20px">'+msg+'</p>'
+    +'<p style="color:#FCA5A5;font-size:13px;margin-bottom:20px">Tindakan ini tidak dapat dibatalkan.</p>'
+    +'<div style="display:flex;gap:10px;justify-content:flex-end">'
+    +'<button class="btn btn-ghost" data-action="confirmCancel">Batal</button>'
+    +'<button class="btn btn-danger" data-action="'+S.confirmPending.act+'">Ya, Hapus</button>'
+    +'</div></div></div></div>';
+}
+
+// ─── MODALS ───────────────────────────────────────────────────
+function selectOpts(opts,val){return opts.map(o=>'<option'+(o===val?' selected':'')+'>'+esc(o)+'</option>').join('');}
+
+function renderModal(){
+  if(!S.modal)return'';
+  const F=S.form;
+  let body='',title='',wide=false;
+
+  if(S.modal==='addConsumable'){
+    title='Tambah Barang Baru';
+    body='<div class="row2"><div class="field"><label>Nama Barang *</label><input id="f_name" value="'+esc(F.name||'')+'" placeholder="cth: Kertas HVS A4"></div>'
+      +'<div class="field"><label>Satuan *</label><input id="f_unit" value="'+esc(F.unit||'')+'" placeholder="Rim, Lusin, Pcs"></div></div>'
+      +'<div class="row2"><div class="field"><label>Stok Awal</label><input id="f_stock" type="number" min="0" value="'+esc(F.stock||'')+'" placeholder="0"></div>'
+      +'<div class="field"><label>Stok Minimum</label><input id="f_minStock" type="number" min="0" value="'+esc(F.minStock||'')+'" placeholder="5"></div></div>'
+      +'<div class="field"><label>Kategori</label><select id="f_category"><option'+(!F.category||F.category==='ATK'?' selected':'')+'>ATK</option><option'+(F.category==='Kebersihan'?' selected':'')+'>Kebersihan</option><option'+(F.category==='Bahan Kimia'?' selected':'')+'>Bahan Kimia</option><option'+(F.category==='Lainnya'?' selected':'')+'>Lainnya</option></select></div>'
+      +'<div class="field"><label>Keterangan</label><textarea id="f_desc" rows="2">'+esc(F.desc||'')+'</textarea></div>'
+      +'<div class="modal-footer"><button class="btn btn-ghost" data-action="closeModal">Batal</button><button class="btn btn-primary" data-action="saveConsumable">Simpan</button></div>';
+  }
+
+  else if(S.modal==='stockIn'){
+    const item=S.consumables.find(c=>c.id===S.selId)||{};
+    title='Stok Masuk — '+esc(item.name||'');
+    body='<div class="info-box">Stok saat ini: <strong style="color:#10B981;font-size:20px">'+item.stock+'</strong> '+esc(item.unit||'')+'</div>'
+      +'<div class="row2"><div class="field"><label>Jumlah Masuk *</label><input id="f_qty" type="number" min="1" value="'+esc(F.qty||'')+'" placeholder="Jumlah"></div>'
+      +'<div class="field"><label>Tanggal</label><input id="f_date" type="date" value="'+esc(F.date||tod())+'"></div></div>'
+      +'<div class="field"><label>Sumber / Keterangan</label><input id="f_purpose" value="'+esc(F.purpose||'')+'" placeholder="cth: Pengadaan Bulanan"></div>'
+      +'<div class="field"><label>Dicatat Oleh</label><input id="f_by" value="'+esc(F.by||'')+'" placeholder="Nama pencatat"></div>'
+      +'<div class="field"><label>Catatan</label><textarea id="f_notes" rows="2">'+esc(F.notes||'')+'</textarea></div>'
+      +'<div class="modal-footer"><button class="btn btn-ghost" data-action="closeModal">Batal</button><button class="btn btn-success" data-action="saveStockIn">Simpan Stok Masuk</button></div>';
+  }
+
+  else if(S.modal==='takeOut'){
+    wide=true;title='Pengambilan Barang';
+    const itemOpts=S.consumables.filter(c=>c.stock>0).map(c=>'<option value="'+c.id+'"'+(F.itemId===c.id?' selected':'')+'>'+esc(c.name)+' (Stok: '+c.stock+' '+esc(c.unit)+')</option>').join('');
+    const selItem=S.consumables.find(c=>c.id===F.itemId);
+    body='<div class="row2"><div class="field"><label>Nama Pengambil *</label><input id="f_by" value="'+esc(F.by||'')+'" placeholder="Nama lengkap"></div>'
+      +'<div class="field"><label>Bagian / Unit Kerja</label><input id="f_dept" value="'+esc(F.dept||'')+'" placeholder="cth: Sekretariat"></div></div>'
+      +'<div class="row2"><div class="field"><label>Barang yang Diambil *</label><select id="f_itemId"><option value="">-- Pilih Barang --</option>'+itemOpts+'</select></div>'
+      +'<div class="field"><label>Jumlah *</label><input id="f_qty" type="number" min="1"'+(selItem?' max="'+selItem.stock+'"':'')+' value="'+esc(F.qty||'')+'" placeholder="Jumlah">'+(selItem?'<div class="hint">Maks: '+selItem.stock+' '+esc(selItem.unit)+'</div>':'')+'</div></div>'
+      +'<div class="field"><label>Tujuan Penggunaan *</label><input id="f_purpose" value="'+esc(F.purpose||'')+'" placeholder="cth: Keperluan rapat, Cetak laporan"></div>'
+      +'<div class="row2"><div class="field"><label>Tanggal Pengambilan</label><input id="f_date" type="date" value="'+esc(F.date||tod())+'"></div>'
+      +'<div class="field"><label>No. Surat / Ref</label><input id="f_ref" value="'+esc(F.ref||'')+'" placeholder="Opsional"></div></div>'
+      +'<div class="field"><label>Catatan Tambahan</label><textarea id="f_notes" rows="2">'+esc(F.notes||'')+'</textarea></div>'
+      +'<div class="modal-footer"><button class="btn btn-ghost" data-action="closeModal">Batal</button><button class="btn btn-danger" data-action="saveTakeOut">Konfirmasi Pengambilan</button></div>';
+  }
+
+  else if(S.modal==='addTool'){
+    title='Tambah Alat Baru';
+    body='<div class="row2"><div class="field"><label>Nama Alat *</label><input id="f_name" value="'+esc(F.name||'')+'" placeholder="cth: Bor Tanah"></div>'
+      +'<div class="field"><label>Kode Alat</label><input id="f_code" value="'+esc(F.code||'')+'" placeholder="cth: BOR-002"></div></div>'
+      +'<div class="row2"><div class="field"><label>Jumlah Unit</label><input id="f_qty" type="number" min="1" value="'+esc(F.qty||1)+'"></div>'
+      +'<div class="field"><label>Satuan</label><input id="f_unit" value="'+esc(F.unit||'Unit')+'"></div></div>'
+      +'<div class="row2"><div class="field"><label>Kategori</label><select id="f_category"><option'+((!F.category||F.category==='Alat Lapangan')?' selected':'')+'>Alat Lapangan</option><option'+(F.category==='Alat Ukur'?' selected':'')+'>Alat Ukur</option><option'+(F.category==='Elektronik'?' selected':'')+'>Elektronik</option><option'+(F.category==='Kendaraan'?' selected':'')+'>Kendaraan</option><option'+(F.category==='Lainnya'?' selected':'')+'>Lainnya</option></select></div>'
+      +'<div class="field"><label>Kondisi Awal</label><select id="f_condition"><option'+((!F.condition||F.condition==='Baik')?' selected':'')+'>Baik</option><option'+(F.condition==='Cukup'?' selected':'')+'>Cukup</option><option'+(F.condition==='Perlu Perbaikan'?' selected':'')+'>Perlu Perbaikan</option></select></div></div>'
+      +'<div class="field"><label>Keterangan</label><textarea id="f_desc" rows="2">'+esc(F.desc||'')+'</textarea></div>'
+      +'<div class="modal-footer"><button class="btn btn-ghost" data-action="closeModal">Batal</button><button class="btn btn-primary" data-action="saveTool">Simpan</button></div>';
+  }
+
+  else if(S.modal==='loanForm'){
+    wide=true;title='Form Peminjaman Alat';
+    const toolOpts=S.tools.filter(t=>t.available>0).map(t=>'<option value="'+t.id+'"'+(F.toolId===t.id?' selected':'')+'>'+esc(t.name)+' — '+esc(t.code||'')+' (Tersedia: '+t.available+')</option>').join('');
+    body='<div class="alert alert-indigo" style="margin-bottom:16px">Setelah simpan, surat peminjaman akan otomatis terbuka untuk dicetak.</div>'
+      +'<div class="section-label">Data Peminjam</div>'
+      +'<div class="row2"><div class="field"><label>Nama Peminjam *</label><input id="f_borrower" value="'+esc(F.borrower||'')+'" placeholder="Nama lengkap"></div>'
+      +'<div class="field"><label>Departemen / Bagian</label><input id="f_dept" value="'+esc(F.dept||'')+'" placeholder="cth: Tim Lapangan A"></div></div>'
+      +'<div class="field"><label>No. Telepon</label><input id="f_phone" value="'+esc(F.phone||'')+'" placeholder="08xxxxxxxxxx"></div>'
+      +'<div class="section-label">Data Peminjaman</div>'
+      +'<div class="row2"><div class="field"><label>Alat yang Dipinjam *</label><select id="f_toolId"><option value="">-- Pilih Alat --</option>'+toolOpts+'</select></div>'
+      +'<div class="field"><label>Jumlah *</label><input id="f_qty" type="number" min="1" value="'+esc(F.qty||'')+'" placeholder="Jumlah"></div></div>'
+      +'<div class="field"><label>Tujuan Peminjaman *</label><input id="f_purpose" value="'+esc(F.purpose||'')+'" placeholder="cth: Survey Tanah Kec. Ciledug"></div>'
+      +'<div class="row2"><div class="field"><label>Tanggal Peminjaman *</label><input id="f_date" type="date" value="'+esc(F.date||tod())+'"></div>'
+      +'<div class="field"><label>Batas Pengembalian *</label><input id="f_dueDate" type="date" value="'+esc(F.dueDate||'')+'"></div></div>'
+      +'<div class="row2"><div class="field"><label>Kondisi Alat Saat Dipinjam</label><select id="f_conditionOut"><option'+((!F.conditionOut||F.conditionOut==='Baik')?' selected':'')+'>Baik</option><option'+(F.conditionOut==='Cukup'?' selected':'')+'>Cukup</option><option'+(F.conditionOut==='Perlu Perbaikan'?' selected':'')+'>Perlu Perbaikan</option></select></div>'
+      +'<div class="field"><label>Catatan Tambahan</label><input id="f_notes" value="'+esc(F.notes||'')+'" placeholder="Opsional"></div></div>'
+      +'<div class="modal-footer"><button class="btn btn-ghost" data-action="closeModal">Batal</button><button class="btn btn-primary" data-action="saveLoan">📋 Simpan & Cetak Surat</button></div>';
+  }
+
+  else if(S.modal==='returnForm'){
+    const loan=S.loans.find(l=>l.id===S.selId)||{};
+    title='Form Pengembalian Alat';
+    body='<div class="info-box"><div style="font-size:13px;color:#64748B;margin-bottom:6px">Alat yang dikembalikan:</div>'
+      +'<div style="font-size:16px;font-weight:700">'+esc(loan.toolName)+'</div>'
+      +'<div style="font-size:13px;color:#64748B">Peminjam: '+esc(loan.borrower)+' — '+esc(loan.dept||'')+'</div>'
+      +'<div style="font-size:13px;color:#64748B">Jumlah: '+loan.qty+' unit</div></div>'
+      +'<div class="row2"><div class="field"><label>Tanggal Pengembalian *</label><input id="f_returnDate" type="date" value="'+esc(F.returnDate||tod())+'"></div>'
+      +'<div class="field"><label>Kondisi Saat Dikembalikan *</label><select id="f_conditionIn"><option'+((!F.conditionIn||F.conditionIn==='Baik')?' selected':'')+'>Baik</option><option'+(F.conditionIn==='Cukup'?' selected':'')+'>Cukup</option><option'+(F.conditionIn==='Perlu Perbaikan'?' selected':'')+'>Perlu Perbaikan</option><option'+(F.conditionIn==='Rusak'?' selected':'')+'>Rusak</option></select></div></div>'
+      +'<div class="field"><label>Catatan Pengembalian</label><textarea id="f_returnNotes" rows="3" placeholder="Catatan kondisi, kerusakan, dll...">'+esc(F.returnNotes||'')+'</textarea></div>'
+      +'<div class="alert alert-green">Berita acara pengembalian akan otomatis terbuka untuk dicetak.</div>'
+      +'<div class="modal-footer"><button class="btn btn-ghost" data-action="closeModal">Batal</button><button class="btn btn-success" data-action="saveReturn">Konfirmasi & Cetak BA</button></div>';
+  }
+
+  else if(S.modal==='addAsset'){
+    wide=true;title='Tambah Aset Baru';
+    const pp=F.purchasePrice||'';const ls=F.lifespan||5;
+    const annualPrev=(pp&&ls)?'<div class="info-box">📊 Penyusutan/tahun: <strong style="color:#F59E0B">'+fmtRp(Math.round(pp/ls))+'</strong> (metode garis lurus)</div>':'';
+    body='<div class="row2"><div class="field"><label>Nama Aset *</label><input id="f_name" value="'+esc(F.name||'')+'" placeholder="cth: Meja Kerja Oak"></div>'
+      +'<div class="field"><label>Kode Aset</label><input id="f_code" value="'+esc(F.code||'')+'" placeholder="cth: FRN-003"></div></div>'
+      +'<div class="row2"><div class="field"><label>Kategori</label><select id="f_category"><option'+((!F.category||F.category==='Furnitur')?' selected':'')+'>Furnitur</option><option'+(F.category==='Elektronik'?' selected':'')+'>Elektronik</option><option'+(F.category==='Kendaraan'?' selected':'')+'>Kendaraan</option><option'+(F.category==='Bangunan'?' selected':'')+'>Bangunan</option><option'+(F.category==='Peralatan'?' selected':'')+'>Peralatan</option><option'+(F.category==='Lainnya'?' selected':'')+'>Lainnya</option></select></div>'
+      +'<div class="field"><label>No. Seri / S/N</label><input id="f_serial" value="'+esc(F.serial||'')+'" placeholder="Serial number"></div></div>'
+      +'<div class="row2"><div class="field"><label>Tanggal Perolehan *</label><input id="f_purchaseDate" type="date" value="'+esc(F.purchaseDate||'')+'"></div>'
+      +'<div class="field"><label>Harga Perolehan (Rp) *</label><input id="f_purchasePrice" type="number" min="0" value="'+esc(F.purchasePrice||'')+'" placeholder="cth: 2500000"></div></div>'
+      +'<div class="row2"><div class="field"><label>Masa Manfaat (Tahun)</label><input id="f_lifespan" type="number" min="1" value="'+esc(F.lifespan||5)+'"></div>'
+      +'<div class="field"><label>Lokasi / Ruangan</label><input id="f_location" value="'+esc(F.location||'')+'" placeholder="cth: Ruang Kerja"></div></div>'
+      +'<div class="row2"><div class="field"><label>Kondisi Awal</label><select id="f_condition"><option'+((!F.condition||F.condition==='Baik')?' selected':'')+'>Baik</option><option'+(F.condition==='Cukup'?' selected':'')+'>Cukup</option><option'+(F.condition==='Perlu Perbaikan'?' selected':'')+'>Perlu Perbaikan</option></select></div>'
+      +'<div class="field"><label>Status</label><select id="f_status"><option'+((!F.status||F.status==='Aktif')?' selected':'')+'>Aktif</option><option'+(F.status==='Dalam Perbaikan'?' selected':'')+'>Dalam Perbaikan</option><option'+(F.status==='Disposal'?' selected':'')+'>Disposal</option><option'+(F.status==='Hilang'?' selected':'')+'>Hilang</option></select></div></div>'
+      +'<div class="field"><label>Keterangan</label><textarea id="f_desc" rows="2">'+esc(F.desc||'')+'</textarea></div>'
+      +annualPrev
+      +'<div class="modal-footer"><button class="btn btn-ghost" data-action="closeModal">Batal</button><button class="btn btn-primary" data-action="saveAsset">Simpan Aset</button></div>';
+  }
+
+  else if(S.modal==='editAsset'){
+    const asset=S.assets.find(a=>a.id===S.selId)||{};
+    title='Edit — '+esc(asset.name||'');
+    body='<div class="row2"><div class="field"><label>Kondisi</label><select id="f_condition"><option'+(((F.condition||asset.condition)==='Baik')?' selected':'')+'>Baik</option><option'+(((F.condition||asset.condition)==='Cukup')?' selected':'')+'>Cukup</option><option'+(((F.condition||asset.condition)==='Perlu Perbaikan')?' selected':'')+'>Perlu Perbaikan</option><option'+(((F.condition||asset.condition)==='Rusak')?' selected':'')+'>Rusak</option></select></div>'
+      +'<div class="field"><label>Status</label><select id="f_status"><option'+(((F.status||asset.status)==='Aktif')?' selected':'')+'>Aktif</option><option'+(((F.status||asset.status)==='Dalam Perbaikan')?' selected':'')+'>Dalam Perbaikan</option><option'+(((F.status||asset.status)==='Disposal')?' selected':'')+'>Disposal</option><option'+(((F.status||asset.status)==='Hilang')?' selected':'')+'>Hilang</option></select></div></div>'
+      +'<div class="field"><label>Lokasi</label><input id="f_location" value="'+esc(F.location!=null?F.location:asset.location||'')+'"></div>'
+      +'<div class="field"><label>Keterangan</label><textarea id="f_desc" rows="3">'+esc(F.desc!=null?F.desc:asset.desc||'')+'</textarea></div>'
+      +'<div class="modal-footer"><button class="btn btn-ghost" data-action="closeModal">Batal</button><button class="btn btn-primary" data-action="saveEditAsset">Simpan Perubahan</button></div>';
+  }
+
+  else if(S.modal==='addMaint'){
+    const asset=S.assets.find(a=>a.id===S.selId)||{};
+    title='Catat Pemeliharaan — '+esc(asset.name||'');
+    body='<div class="row2"><div class="field"><label>Tanggal *</label><input id="f_date" type="date" value="'+esc(F.date||tod())+'"></div>'
+      +'<div class="field"><label>Jenis Perawatan *</label><select id="f_type"><option value="">-- Pilih --</option><option'+(F.type==='Perawatan Rutin'?' selected':'')+'>Perawatan Rutin</option><option'+(F.type==='Perbaikan'?' selected':'')+'>Perbaikan</option><option'+(F.type==='Penggantian Komponen'?' selected':'')+'>Penggantian Komponen</option><option'+(F.type==='Kalibrasi'?' selected':'')+'>Kalibrasi</option><option'+(F.type==='Lainnya'?' selected':'')+'>Lainnya</option></select></div></div>'
+      +'<div class="row2"><div class="field"><label>Biaya (Rp)</label><input id="f_cost" type="number" min="0" value="'+esc(F.cost||'')+'" placeholder="0"></div>'
+      +'<div class="field"><label>Dikerjakan Oleh</label><input id="f_tech" value="'+esc(F.tech||'')+'" placeholder="cth: Teknisi Internal"></div></div>'
+      +'<div class="field"><label>Keterangan Pekerjaan</label><textarea id="f_desc" rows="3" placeholder="Jelaskan pekerjaan yang dilakukan...">'+esc(F.desc||'')+'</textarea></div>'
+      +'<div class="modal-footer"><button class="btn btn-ghost" data-action="closeModal">Batal</button><button class="btn btn-amber" data-action="saveMaint">🔨 Simpan</button></div>';
+  }
+
+  return'<div class="modal-overlay" id="modal-overlay">'
+    +'<div class="modal-box '+(wide?'wide':'narrow')+'">'
+    +'<div class="modal-header"><span class="modal-title">'+title+'</span><button class="modal-close" data-action="closeModal">&#x2715;</button></div>'
+    +'<div class="modal-body">'+body+'</div>'
+    +'</div></div>';
+}
+
+// ─── MAIN RENDER ─────────────────────────────────────────────
+function render(){
+  const app=document.getElementById('app');
+  let pageHtml='';
+  if(S.page==='setup')pageHtml=renderSetup(S.setupErr||'');
+  else if(S.page==='dashboard')pageHtml=renderDashboard();
+  else if(S.page==='consumables')pageHtml=renderConsumables();
+  else if(S.page==='longterm')pageHtml=renderLongTerm();
+  else if(S.page==='assets')pageHtml=renderAssets();
+
+  if(S.page==='setup'){
+    app.innerHTML=pageHtml;
+  }else{
+    app.innerHTML=renderSidebar()+'<main id="main-content">'+pageHtml+'</main>'+renderModal()+renderConfirm();
+  }
+
+  // Re-attach search listener
+  const si=document.getElementById('search-inp');
+  if(si)si.addEventListener('input',e=>{S.search=e.target.value;render();});
+
+  // Scroll to top on page change
+  const mc=document.getElementById('main-content');
+  if(mc)mc.scrollTop=0;
+}
+
+// ─── EVENT HANDLING ───────────────────────────────────────────
+function getF(){
+  const get=id=>{const el=document.getElementById(id);return el?el.value:undefined;};
+  return{name:get('f_name'),unit:get('f_unit'),stock:get('f_stock'),minStock:get('f_minStock'),
+    category:get('f_category'),desc:get('f_desc'),qty:get('f_qty'),date:get('f_date'),
+    by:get('f_by'),purpose:get('f_purpose'),dept:get('f_dept'),notes:get('f_notes'),
+    ref:get('f_ref'),itemId:get('f_itemId'),
+    borrower:get('f_borrower'),phone:get('f_phone'),toolId:get('f_toolId'),
+    dueDate:get('f_dueDate'),conditionOut:get('f_conditionOut'),
+    returnDate:get('f_returnDate'),conditionIn:get('f_conditionIn'),returnNotes:get('f_returnNotes'),
+    code:get('f_code'),condition:get('f_condition'),status:get('f_status'),
+    purchaseDate:get('f_purchaseDate'),purchasePrice:get('f_purchasePrice'),
+    lifespan:get('f_lifespan'),location:get('f_location'),serial:get('f_serial'),
+    cost:get('f_cost'),tech:get('f_tech'),type:get('f_type'),
+  };
+}
+
+document.addEventListener('click',e=>{
+  // Nav buttons
+  const nav=e.target.closest('[data-nav]');
+  if(nav){S.page=nav.dataset.nav;S.search='';S.modal=null;render();return;}
+
+  // Tab buttons
+  const tab=e.target.closest('[data-tab]');
+  if(tab){const[p,t]=tab.dataset.tab.split(':');S.tab[p]=t;render();return;}
+
+  // Filter buttons
+  const af=e.target.closest('[data-assetfilter]');
+  if(af){S.assetFilter=af.dataset.assetfilter;render();return;}
+
+  // Actions
+  const act=e.target.closest('[data-action]');
+  if(!act)return;
+  const action=act.dataset.action;
+  const id=act.dataset.id;
+
+  if(action==='openSetup'){const prevPage=S.page;S.page='setup';S.setupErr='';render();return;}
+  if(action==='connectFirebase'){
+    const apiKey=document.getElementById('fb_apiKey')?.value?.trim();
+    const projectId=document.getElementById('fb_projectId')?.value?.trim();
+    const appId=document.getElementById('fb_appId')?.value?.trim();
+    const authDomain=document.getElementById('fb_authDomain')?.value?.trim()||projectId+'.firebaseapp.com';
+    if(!apiKey||!projectId||!appId){S.setupErr='API Key, Project ID, dan App ID wajib diisi';render();return;}
+    const cfg={apiKey,authDomain,projectId,appId};
+    saveConfig(cfg);
+    _fbStatus='loading';
+    S.page='dashboard';
+    const ok=initFirebase(cfg);
+    if(!ok){_fbStatus='error';S.page='setup';S.setupErr='Gagal terhubung. Periksa konfigurasi Firebase Anda.';}
+    render();return;
+  }
+  if(action==='closeModal'){S.modal=null;S.form={};S.selId=null;render();return;}
+  if(action==='openAddConsumable'){S.modal='addConsumable';S.form={};render();return;}
+  if(action==='openTakeOut'){S.modal='takeOut';S.form={date:tod()};render();return;}
+  if(action==='stockIn'){S.modal='stockIn';S.selId=id;S.form={date:tod()};render();return;}
+  if(action==='openAddTool'){S.modal='addTool';S.form={condition:'Baik',qty:1};render();return;}
+  if(action==='openLoanForm'){S.modal='loanForm';S.form={date:tod(),conditionOut:'Baik'};render();return;}
+  if(action==='openLoan'){S.modal='loanForm';S.form={toolId:id,date:tod(),conditionOut:'Baik',qty:1};render();return;}
+  if(action==='openReturn'){S.modal='returnForm';S.selId=id;S.form={returnDate:tod(),conditionIn:'Baik'};render();return;}
+  if(action==='openAddAsset'){S.modal='addAsset';S.form={condition:'Baik',status:'Aktif',lifespan:5,category:'Furnitur'};render();return;}
+  if(action==='openEditAsset'){S.modal='editAsset';S.selId=id;S.form={};render();return;}
+  if(action==='openAddMaint'){S.modal='addMaint';S.selId=id;S.form={date:tod()};render();return;}
+
+  if(action==='printLoan'){const l=S.loans.find(x=>x.id===id);if(l)printLoan(l);return;}
+  if(action==='printReturn'){const l=S.loans.find(x=>x.id===id);if(l)printReturn(l);return;}
+
+  if(action==='deleteConsumable'){S.confirmPending={act:'doDeleteConsumable',id};render();return;}
+  if(action==='deleteTool'){S.confirmPending={act:'doDeleteTool',id};render();return;}
+  if(action==='deleteAsset'){S.confirmPending={act:'doDeleteAsset',id};render();return;}
+
+  if(action==='saveConsumable'){
+    const f=getF();
+    if(!f.name||!f.unit){alert('Nama dan satuan wajib diisi');return;}
+    const item={id:uid(),name:f.name,unit:f.unit,stock:Number(f.stock)||0,minStock:Number(f.minStock)||5,category:f.category||'ATK',desc:f.desc||''};
+    S.consumables.push(item);
+    if(Number(f.stock)>0)S.txs.push({id:uid(),type:'in',itemId:item.id,itemName:item.name,qty:Number(f.stock),date:tod(),by:'Admin',purpose:'Stok Awal',dept:'',notes:''});
+    S.modal=null;S.form={};saveStorage();render();return;
+  }
+
+  if(action==='saveStockIn'){
+    const f=getF();
+    if(!f.qty||Number(f.qty)<=0){alert('Jumlah tidak valid');return;}
+    S.consumables=S.consumables.map(c=>c.id===S.selId?{...c,stock:c.stock+Number(f.qty)}:c);
+    const item=S.consumables.find(c=>c.id===S.selId);
+    S.txs.push({id:uid(),type:'in',itemId:S.selId,itemName:item?.name||'',qty:Number(f.qty),date:f.date||tod(),by:f.by||'Admin',purpose:f.purpose||'Pengadaan',dept:'',notes:f.notes||''});
+    S.modal=null;S.form={};S.selId=null;saveStorage();render();return;
+  }
+
+  if(action==='saveTakeOut'){
+    const f=getF();
+    const item=S.consumables.find(c=>c.id===f.itemId);
+    if(!item){alert('Pilih barang terlebih dahulu');return;}
+    if(!f.qty||Number(f.qty)<=0||Number(f.qty)>item.stock){alert('Jumlah tidak valid atau melebihi stok ('+item.stock+')');return;}
+    if(!f.by){alert('Nama pengambil wajib diisi');return;}
+    if(!f.purpose){alert('Tujuan penggunaan wajib diisi');return;}
+    S.consumables=S.consumables.map(c=>c.id===item.id?{...c,stock:c.stock-Number(f.qty)}:c);
+    S.txs.push({id:uid(),type:'out',itemId:item.id,itemName:item.name,qty:Number(f.qty),date:f.date||tod(),by:f.by,purpose:f.purpose,dept:f.dept||'',notes:f.notes||''});
+    S.modal=null;S.form={};saveStorage();render();return;
+  }
+
+  if(action==='saveTool'){
+    const f=getF();
+    if(!f.name){alert('Nama alat wajib diisi');return;}
+    const q=Number(f.qty)||1;
+    S.tools.push({id:uid(),name:f.name,code:f.code||'',unit:f.unit||'Unit',qty:q,available:q,condition:f.condition||'Baik',category:f.category||'Alat Lapangan',desc:f.desc||''});
+    S.modal=null;S.form={};saveStorage();render();return;
+  }
+
+  if(action==='confirmCancel'){S.confirmPending=null;render();return;}
+  if(action==='doDeleteConsumable'){const xid=S.confirmPending?.id;S.confirmPending=null;if(xid){S.consumables=S.consumables.filter(c=>c.id!==xid);saveStorage();}render();return;}
+  if(action==='doDeleteTool'){const xid=S.confirmPending?.id;S.confirmPending=null;if(xid){S.tools=S.tools.filter(t=>t.id!==xid);saveStorage();}render();return;}
+  if(action==='doDeleteAsset'){const xid=S.confirmPending?.id;S.confirmPending=null;if(xid){S.assets=S.assets.filter(a=>a.id!==xid);saveStorage();}render();return;}
+
+  if(action==='saveLoan'){
+    const f=getF();
+    const tool=S.tools.find(t=>t.id===f.toolId);
+    if(!tool){alert('Pilih alat terlebih dahulu');return;}
+    if(!f.borrower||!f.date||!f.dueDate||!f.qty){alert('Lengkapi semua field wajib (*)');return;}
+    const q=Number(f.qty);
+    if(q>tool.available){alert('Stok tidak mencukupi (tersedia: '+tool.available+')');return;}
+    const loan={id:uid(),toolId:tool.id,toolName:tool.name,code:tool.code||'',borrower:f.borrower,dept:f.dept||'',phone:f.phone||'',date:f.date,dueDate:f.dueDate,qty:q,purpose:f.purpose||'',conditionOut:f.conditionOut||'Baik',status:'active',returnDate:null,conditionIn:null,returnNotes:'',notes:f.notes||''};
+    S.loans.push(loan);
+    S.tools=S.tools.map(t=>t.id===tool.id?{...t,available:t.available-q}:t);
+    S.modal=null;S.form={};saveStorage();render();
+    setTimeout(()=>printLoan(loan),300);return;
+  }
+
+  if(action==='saveReturn'){
+    const f=getF();
+    if(!f.conditionIn||!f.returnDate){alert('Isi kondisi dan tanggal pengembalian');return;}
+    const loan=S.loans.find(l=>l.id===S.selId);
+    if(!loan)return;
+    const updated={...loan,status:'returned',returnDate:f.returnDate,conditionIn:f.conditionIn,returnNotes:f.returnNotes||''};
+    S.loans=S.loans.map(l=>l.id===S.selId?updated:l);
+    S.tools=S.tools.map(t=>t.id===loan.toolId?{...t,available:t.available+loan.qty,condition:f.conditionIn}:t);
+    S.modal=null;S.form={};S.selId=null;saveStorage();render();
+    setTimeout(()=>printReturn(updated),300);return;
+  }
+
+  if(action==='saveAsset'){
+    const f=getF();
+    if(!f.name||!f.purchaseDate||!f.purchasePrice){alert('Lengkapi field wajib (*)');return;}
+    S.assets.push({id:uid(),name:f.name,code:f.code||'',category:f.category||'Furnitur',purchaseDate:f.purchaseDate,purchasePrice:Number(f.purchasePrice),lifespan:Number(f.lifespan)||5,condition:f.condition||'Baik',location:f.location||'',serial:f.serial||'',status:f.status||'Aktif',desc:f.desc||''});
+    S.modal=null;S.form={};saveStorage();render();return;
+  }
+
+  if(action==='saveEditAsset'){
+    const f=getF();
+    S.assets=S.assets.map(a=>a.id===S.selId?{...a,condition:f.condition||a.condition,status:f.status||a.status,location:f.location!=null?f.location:a.location,desc:f.desc!=null?f.desc:a.desc}:a);
+    S.modal=null;S.form={};S.selId=null;saveStorage();render();return;
+  }
+
+  if(action==='saveMaint'){
+    const f=getF();
+    if(!f.date||!f.type){alert('Lengkapi tanggal dan jenis perawatan');return;}
+    const asset=S.assets.find(a=>a.id===S.selId)||{};
+    S.maint.push({id:uid(),assetId:S.selId,assetName:asset.name||'',date:f.date,type:f.type,cost:Number(f.cost)||0,desc:f.desc||'',tech:f.tech||''});
+    S.modal=null;S.form={};S.selId=null;saveStorage();render();return;
+  }
+});
+
+// Close modal on overlay click
+document.addEventListener('click',e=>{
+  if(e.target.id==='modal-overlay'){S.modal=null;S.form={};S.selId=null;render();}
+});
+
+// Handle live update for asset price/lifespan in addAsset modal
+document.addEventListener('input',e=>{
+  if(S.modal==='addAsset'&&(e.target.id==='f_purchasePrice'||e.target.id==='f_lifespan')){
+    S.form.purchasePrice=document.getElementById('f_purchasePrice')?.value;
+    S.form.lifespan=document.getElementById('f_lifespan')?.value;
+    render();
+  }
+  if(S.modal==='takeOut'&&e.target.id==='f_itemId'){
+    S.form.itemId=e.target.value;render();
+  }
+});
+
+// ─── INIT ─────────────────────────────────────────────────────
+// Konfigurasi Firebase UPJKP — sudah ditanam langsung, tidak perlu setup manual
+const EMBEDDED_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyD7rdX4s8IUMZ61x1UlkD9s6cnjZ0TgW4U",
+  authDomain: "inventarisupjkp.firebaseapp.com",
+  projectId: "inventarisupjkp",
+  storageBucket: "inventarisupjkp.firebasestorage.app",
+  messagingSenderId: "684464930266",
+  appId: "1:684464930266:web:f439681d9074cc836254e3"
+};
+
+(function(){
+  _fbStatus='loading';
+  S.page='dashboard';
+  render(); // tampilkan loading dulu
+  initFirebase(EMBEDDED_FIREBASE_CONFIG); // onSnapshot akan memanggil render() setelah data dimuat
+})();
+</script>
+</body>
+</html>
